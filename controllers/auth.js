@@ -1,8 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 
 const prisma = new PrismaClient();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const register = async (req, res) => {
     const { email, password } = req.body;
@@ -50,6 +52,21 @@ const login = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
     }
+}
+
+const verify = async(token)=>{
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const userId = payload['sub'];
+
+    if(!userId){
+        return null;
+    }
+
+    return userId;
 }
 
 export { register, login };

@@ -16,6 +16,16 @@ app.get('/protected', authMiddleware, (req, res) => {
     res.json({ message: 'This is a protected route' });
 });
 
+app.get('/api/getClientId', (req, res) => {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (clientId) {
+        res.json({ clientId });
+    } else {
+        res.status(500).json({ error: 'Client ID not found' });
+    }
+})
+
 app.get('/', (req, res) => {
     res.send('Welcome to the API');
 });
